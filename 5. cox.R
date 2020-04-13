@@ -138,31 +138,7 @@ for (k in 1:nk){
   
   ridge.ERR <- predErr(surv.tr, surv.te, ridge.pred.tr, ridge.pred.te, type = "brier", times = ts, int.type = "weighted")
   bs_ridge[k] <- ridge.ERR$ierror
-  
-  # # elastic-net 
-  # a <- seq(0.01, 0.99, 0.02)
-  # search <- foreach(i = a, .combine = rbind) %dopar% {
-  #   cv <- cv.glmnet(features_mat[-te.ind,], surv_obj[-te.ind,], family = "cox", alpha = i)
-  #   data.frame(cvm = cv$cvm[cv$lambda == cv$lambda.min], lambda.min = cv$lambda.min, alpha = i)
-  # }
-  # param.en <- search[search$cvm == min(search$cvm),]
-  # 
-  # en.fit <- glmnet(features_mat[-te.ind,], surv_obj[-te.ind,], family = "cox", lambda = param.en$lambda.min, alpha = param.en$alpha, standardize = TRUE)
-  # 
-  # en.temp.tr <- exp(predict(en.fit,  newx = features_mat[-te.ind,], type = "link", s = param.en$lambda.min))
-  # en.temp.te <- exp(predict(en.fit,  newx = features_mat[te.ind,], type = "link", s = param.en$lambda.min))
-  # en.pred.tr <- en.temp.tr/(en.temp.tr + 1)
-  # en.pred.te <- en.temp.te/(en.temp.te + 1)
-  # 
-  # en.res <- survivalROC(Stime = surv.time[te.ind],
-  #                       status  = status[te.ind],
-  #                       marker       = en.pred.te,
-  #                       predict.time = cutoff,
-  #                       span = 0.25*n.te^(-0.20))
-  # auc_en[k] <- en.res$AUC
-  # 
-  # en.ERR <- predErr(surv.tr, surv.te, en.pred.tr, en.pred.te, type = "brier", times = ts, int.type = "weighted")
-  # bs_en[k] <- en.ERR$ierror
+
   
   # elastic-net 2
 
