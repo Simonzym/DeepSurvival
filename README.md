@@ -1,6 +1,9 @@
 # DeepSurvival
 Codes implemented by the paper "Comparative Study of Deep Learning and Other Predictive Models for Survival in Lung Cancer".
 
+## File
+The Lung cancer dataset we used in this analysis is a open source. For replicating the results, you may download the data and images from [\url], and run the following codes on them.
+
 ## R
 --cox.R: survival prediction by cox model, cox model with ridge penalty, cox model with lasso penalty, cox model with Elastic-Net penalty;
 
