@@ -19,6 +19,8 @@ ts <- seq(1, cutoff, 5)
 
 features <- features %>% 
   mutate(PatientID = as.character(PatientID)) %>%
+  #mutate(shortID = substr(PatientID, 7,9)) %>%
+  #filter(!shortID %in% exclude.char) %>%
   filter(!is.na(F1)) %>%
   filter(!is.na(Histology)) %>%
   filter(!is.na(age)) %>%
@@ -34,12 +36,26 @@ features_con = features[, -c(1:10)]
 features_con_scale = features_con%>%scale(., scale = TRUE, center = TRUE)
 features_mat <- as.matrix(cbind(features_cat_ohe, features[,c(2:5)], features_con_scale))
 
+#features_mat <- scale(features_mat, center = T, scale = T)
+
 features_mat <- as.data.frame(features_mat)
 features_mat$survivaltime <- as.numeric(features$Survival.time)
 features_mat$status <- features$deadstatus.event
-rf.fit <- rfsrc(Surv(survivaltime, status) ~., data = features_mat)
 
-cox.fit = coxph(Surv(survivaltime, status) ~., data = features_mat, x = TRUE)
-prederror = pec(list(rf.fit), data = features_mat, formula = as.formula(Hist(survivaltime, status) ~ 1), splitMethod = 'bootcv',
-                B = 50, times = ts, maxtime = cutoff)
-c_index = 1 - rf.fit$err.rate[rf.fit$ntree]
+nk <- 10
+index.kfold <- createFolds(seq(1, nrow(features)), k = nk, 
+                           list = TRUE, returnTrain = FALSE)
+c_index = rep(NA, nk)
+for(k in 1:nk){
+  te.ind <- index.kfold[[k]]
+  n.te <- length(te.ind)
+  
+  rf.fit <- rfsrc(Surv(survivaltime, status) ~., data = features_mat[-te.ind,])
+  rf.pred = predict(rf.fit, features_mat[te.ind,])
+  #cox.fit = coxph(Surv(survivaltime, status) ~., data = features_mat, x = TRUE)
+  prederror = pec(list(rf.fit), data = features_mat[te.ind,], formula = as.formula(Hist(survivaltime, status) ~ 1), splitMethod = 'bootcv',
+                  B = 50, times = ts, maxtime = cutoff)
+  print(prederror)
+  c_index[k] = 1 - rf.pred$err.rate[rf.pred$ntree]
+}
+bs = c(0.23,0.224,0.211,0.225,0.21,0.232,0.226,0.19,0.23,0.215)
