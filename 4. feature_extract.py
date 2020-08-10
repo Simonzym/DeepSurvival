@@ -125,7 +125,7 @@ sgd = SGD(lr=1e-5, decay=0.01, momentum=0.9, nesterov=True)
 inception_top.compile(loss=negative_log_likelihood(e), optimizer=sgd)
 # inception_top.compile(loss='binary_crossentropy',optimizer='adam',metrics=['accuracy'])
 
-history_inception = inception_top.fit(x2/np.max(x2), np.asarray(e), batch_size=285, epochs=1000, shuffle = False)
+history_inception = inception_top.fit(x2/np.max(x2), np.asarray(e), batch_size=19, epochs=10, shuffle = False)
 
 '''
 hr_pred = inception_top.predict(X_train)
